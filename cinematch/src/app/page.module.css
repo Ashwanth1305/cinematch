@@ -1,0 +1,442 @@
+.landing {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   Navbar
+   ============================================ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  z-index: 100;
+  transition: all var(--transition-base);
+}
+
+.navScrolled {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ============================================
+   Hero Section
+   ============================================ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 40px 80px;
+  position: relative;
+}
+
+.heroContent {
+  max-width: 800px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  animation: slideUp 0.8s ease-out;
+}
+
+.heroTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: var(--accent-primary-light);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  letter-spacing: -0.03em;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.heroCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.heroGlow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.heroGlow1 {
+  top: 10%;
+  left: 10%;
+  background: var(--accent-primary);
+}
+
+.heroGlow2 {
+  bottom: 10%;
+  right: 10%;
+  background: var(--accent-secondary);
+}
+
+/* Platform pills in hero */
+.heroPlatforms {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+}
+
+.platformPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  animation: slideUp 0.8s ease-out;
+  animation-fill-mode: both;
+}
+
+.platformPill:nth-child(1) { animation-delay: 0.1s; }
+.platformPill:nth-child(2) { animation-delay: 0.2s; }
+.platformPill:nth-child(3) { animation-delay: 0.3s; }
+.platformPill:nth-child(4) { animation-delay: 0.4s; }
+.platformPill:nth-child(5) { animation-delay: 0.5s; }
+.platformPill:nth-child(6) { animation-delay: 0.6s; }
+.platformPill:nth-child(7) { animation-delay: 0.7s; }
+.platformPill:nth-child(8) { animation-delay: 0.8s; }
+
+.platformDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+}
+
+/* ============================================
+   Features Section
+   ============================================ */
+.features {
+  padding: 100px 40px;
+  position: relative;
+}
+
+.featuresGrid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.sectionLabel {
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--accent-primary-light);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.sectionTitle {
+  text-align: center;
+  margin-bottom: 60px;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.featureCard {
+  padding: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.featureCard:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow);
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.featureCard:hover::before {
+  opacity: 1;
+}
+
+.featureIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: var(--accent-gradient-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+}
+
+.featureCard h3 {
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+}
+
+.featureCard p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ============================================
+   How It Works
+   ============================================ */
+.howItWorks {
+  padding: 100px 40px;
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+.howItWorks::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-color), transparent);
+}
+
+.steps {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  gap: 24px;
+  padding: 32px 0;
+  position: relative;
+}
+
+.stepNumber {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: white;
+  position: relative;
+  z-index: 2;
+}
+
+.stepLine {
+  position: absolute;
+  left: 23px;
+  top: 80px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent-primary), transparent);
+}
+
+.step:last-child .stepLine {
+  display: none;
+}
+
+.stepContent h3 {
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ============================================
+   CTA Section
+   ============================================ */
+.ctaSection {
+  padding: 100px 40px;
+  text-align: center;
+  position: relative;
+}
+
+.ctaCard {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  background: var(--accent-gradient-subtle);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaCard::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-xl);
+  z-index: -1;
+  opacity: 0.15;
+}
+
+.ctaCard h2 {
+  margin-bottom: 16px;
+}
+
+.ctaCard p {
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  font-size: 1.05rem;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.footer {
+  padding: 40px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+}
+
+.footer p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+  .nav {
+    padding: 0 20px;
+  }
+
+  .hero {
+    padding: 100px 20px 60px;
+  }
+
+  .features {
+    padding: 60px 20px;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .howItWorks {
+    padding: 60px 20px;
+  }
+
+  .step {
+    gap: 16px;
+  }
+
+  .ctaSection {
+    padding: 60px 20px;
+  }
+
+  .ctaCard {
+    padding: 40px 24px;
+  }
+
+  .heroPlatforms {
+    gap: 8px;
+  }
+
+  .platformPill {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
