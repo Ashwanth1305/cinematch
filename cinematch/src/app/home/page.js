@@ -77,11 +77,11 @@ export default function HomePage() {
   const searchTimeout = useRef(null);
 
   const fetchData = useCallback(async () => {
-    try {
-      const uid = user?.id;
-      if (!uid) return;
+    const uid = user?.id;
+    if (!uid) return;
 
-      const [genresRes, trendingRes, comingRes, leavingRes, recommendedRes] = await Promise.all([
+    try {
+      const results = await Promise.allSettled([
         fetch(`/api/movies?userId=${uid}`, { cache: 'no-store' }),
         fetch(`/api/movies?type=trending&userId=${uid}`),
         fetch(`/api/movies?type=coming_soon&userId=${uid}`),
@@ -89,11 +89,13 @@ export default function HomePage() {
         fetch(`/api/recommendations?userId=${uid}&limit=8`, { cache: 'no-store' }),
       ]);
 
-      const genresJson = await genresRes.json();
-      const trendingJson = await trendingRes.json();
-      const comingJson = await comingRes.json();
-      const leavingJson = await leavingRes.json();
-      const recommendedJson = await recommendedRes.json();
+      const safeJson = async (result) => {
+        if (result.status === 'rejected') return {};
+        try { return await result.value.json(); } catch { return {}; }
+      };
+
+      const [genresJson, trendingJson, comingJson, leavingJson, recommendedJson] =
+        await Promise.all(results.map(safeJson));
 
       setGenreData(genresJson.genres || {});
       setTrending(trendingJson.movies || []);
