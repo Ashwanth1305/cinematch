@@ -11,7 +11,7 @@ Endpoints:
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import config
@@ -186,6 +186,47 @@ async def hybrid_score(request: HybridScoreRequest):
     )
 
     return HybridScoreResponse(**result)
+
+
+# ---------------------------------------------------------------------------
+# POST /reload
+# ---------------------------------------------------------------------------
+
+@app.post("/reload")
+async def reload_model_artifacts():
+    """Hot-reload model artifacts from disk into memory without restarting the server."""
+    try:
+        from .model_store import reload_models
+        bundle = reload_models()
+        return {
+            "status": "success",
+            "message": "Model artifacts reloaded successfully.",
+            "is_loaded": bundle.is_loaded,
+            "has_lightfm": bundle.lightfm_model is not None,
+            "has_xgb_ranker": bundle.xgb_ranker is not None,
+        }
+    except Exception as e:
+        logger.error("Failed to hot-reload models: %s", e)
+        raise HTTPException(status_code=500, detail=f"Hot reload failed: {str(e)}")
+
+
+# ---------------------------------------------------------------------------
+# POST /retrain
+# ---------------------------------------------------------------------------
+
+@app.post("/retrain")
+async def trigger_retrain(background_tasks: BackgroundTasks):
+    """Trigger EOD model retraining cycle asynchronously."""
+    try:
+        from .scheduler import run_retrain_cycle
+        background_tasks.add_task(run_retrain_cycle)
+        return {
+            "status": "accepted",
+            "message": "EOD retraining cycle launched in background.",
+        }
+    except Exception as e:
+        logger.error("Failed to trigger retrain: %s", e)
+        raise HTTPException(status_code=500, detail=f"Retrain trigger failed: {str(e)}")
 
 
 # ---------------------------------------------------------------------------

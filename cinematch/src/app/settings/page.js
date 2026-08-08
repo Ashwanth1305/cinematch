@@ -7,8 +7,7 @@ import { useAuth } from '@/lib/AuthContext';
 const PLATFORMS = [
   { id: 1, name: 'Netflix', icon: '🟥' },
   { id: 2, name: 'Prime Video', icon: '🔵' },
-  { id: 3, name: 'Hotstar', icon: '🌟' },
-  { id: 4, name: 'Jio Cinema', icon: '🟣' },
+  { id: 3, name: 'JioHotstar', icon: '✨' },
   { id: 5, name: 'Zee5', icon: '🟪' },
   { id: 6, name: 'SonyLIV', icon: '🔴' },
   { id: 7, name: 'Apple TV+', icon: '🍎' },

@@ -59,6 +59,13 @@ def load_ratings() -> pd.DataFrame:
         logger.info("  → %d rows, columns: %s", len(df), list(df.columns))
         frames.append(df)
 
+    live_path = config.DATA_DIR / "live_user_feedback.csv"
+    if live_path.exists():
+        logger.info("Loading live user feedback from PostgreSQL (%s) …", live_path.name)
+        live_df = pd.read_csv(live_path)
+        logger.info("  → %d live feedback rows appended", len(live_df))
+        frames.append(live_df)
+
     ratings = pd.concat(frames, ignore_index=True)
     logger.info("Combined ratings: %d rows total", len(ratings))
 

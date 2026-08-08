@@ -20,8 +20,9 @@ const GENRE_CONFIG = [
 const PLATFORM_ICONS = {
   'Netflix': '🟥',
   'Prime Video': '🔵',
-  'Hotstar': '🌟',
-  'Jio Cinema': '🟣',
+  'JioHotstar': '✨',
+  'Hotstar': '✨',
+  'Jio Cinema': '✨',
   'Zee5': '🟪',
   'SonyLIV': '🔴',
   'Apple TV+': '🍎',
@@ -157,14 +158,14 @@ export default function HomePage() {
   };
 
   const handleWatchClick = (movie) => {
-    if (!movie.platforms || movie.platforms.length === 0) {
-      showToast('No streaming platform available', 'error');
-      return;
-    }
-    if (movie.platforms.length === 1) {
-      handleRedirect(movie, movie.platforms[0]);
+    const platforms = (movie?.platforms && movie.platforms.length > 0)
+      ? movie.platforms
+      : [{ id: 3, name: 'JioHotstar' }];
+
+    if (platforms.length === 1) {
+      handleRedirect(movie, platforms[0]);
     } else {
-      setShowPlatformModal(movie);
+      setShowPlatformModal({ ...movie, platforms });
     }
   };
 
@@ -189,8 +190,9 @@ export default function HomePage() {
       const urls = {
         'Netflix': 'https://www.netflix.com',
         'Prime Video': 'https://www.primevideo.com',
-        'Hotstar': 'https://www.hotstar.com',
-        'Jio Cinema': 'https://www.jiocinema.com',
+        'JioHotstar': 'https://www.jiohotstar.com',
+        'Hotstar': 'https://www.jiohotstar.com',
+        'Jio Cinema': 'https://www.jiohotstar.com',
         'Zee5': 'https://www.zee5.com',
         'SonyLIV': 'https://www.sonyliv.com',
         'Apple TV+': 'https://tv.apple.com',
@@ -602,18 +604,19 @@ export default function HomePage() {
                 )}
               </div>
 
-              {selectedMovie.platforms && selectedMovie.platforms.length > 0 && (
-                <div className={styles.modalPlatforms}>
-                  <h4>Available on</h4>
-                  <div className={styles.platformPills}>
-                    {selectedMovie.platforms.map((p, i) => (
-                      <button key={i} className={styles.platformPill} onClick={() => handleRedirect(selectedMovie, p)}>
-                        {PLATFORM_ICONS[p.name] || '📺'} {p.name}
-                      </button>
-                    ))}
-                  </div>
+              <div className={styles.modalPlatforms}>
+                <h4>Available on</h4>
+                <div className={styles.platformPills}>
+                  {((selectedMovie.platforms && selectedMovie.platforms.length > 0)
+                    ? selectedMovie.platforms
+                    : [{ id: 3, name: 'JioHotstar' }]
+                  ).map((p, i) => (
+                    <button key={i} className={styles.platformPill} onClick={() => handleRedirect(selectedMovie, p)}>
+                      {PLATFORM_ICONS[p.name] || '✨'} {p.name}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
 
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <button

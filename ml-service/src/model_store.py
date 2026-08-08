@@ -99,6 +99,15 @@ def load_models() -> ModelBundle:
     return bundle
 
 
+def reload_models() -> ModelBundle:
+    """Force reload all model artifacts from disk into memory (hot-reload)."""
+    global _bundle
+    logger.info("Hot-reloading model bundle artifacts from disk ...")
+    bundle = load_models()
+    _bundle = bundle
+    return _bundle
+
+
 def get_bundle() -> ModelBundle:
     """Get the current model bundle, loading if needed."""
     global _bundle

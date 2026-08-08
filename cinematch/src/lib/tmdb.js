@@ -3,9 +3,15 @@
  * Handles all communication with The Movie Database API
  */
 
+function getTmdbKey() {
+  return (process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY || '1d128e2d2adb96331a1257bfcb4ab046').trim();
+}
+
+function getTmdbBearerToken() {
+  return (process.env.TMDB_READ_ACCESS_TOKEN || process.env.TMDB_BEARER_TOKEN || '').trim();
+}
+
 const TMDB_BASE = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3';
-const TMDB_KEY = (process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY || '').trim();
-const TMDB_BEARER_TOKEN = (process.env.TMDB_READ_ACCESS_TOKEN || process.env.TMDB_BEARER_TOKEN || '').trim();
 const TMDB_IMAGE = process.env.TMDB_IMAGE_BASE || 'https://image.tmdb.org/t/p';
 const PLACEHOLDER_TMDB_VALUES = new Set([
   'demo_key',
@@ -16,9 +22,11 @@ const PLACEHOLDER_TMDB_VALUES = new Set([
 ]);
 
 export function hasValidTmdbConfig() {
+  const key = getTmdbKey();
+  const bearer = getTmdbBearerToken();
   return Boolean(
-    (TMDB_KEY && !PLACEHOLDER_TMDB_VALUES.has(TMDB_KEY)) ||
-    (TMDB_BEARER_TOKEN && !PLACEHOLDER_TMDB_VALUES.has(TMDB_BEARER_TOKEN))
+    (key && !PLACEHOLDER_TMDB_VALUES.has(key)) ||
+    (bearer && !PLACEHOLDER_TMDB_VALUES.has(bearer))
   );
 }
 
@@ -26,8 +34,8 @@ export function hasValidTmdbConfig() {
 const SUPPORTED_PROVIDERS = {
   8: 'Netflix',
   119: 'Prime Video',
-  122: 'Hotstar',
-  220: 'Jio Cinema',
+  122: 'JioHotstar',
+  220: 'JioHotstar',
   232: 'Zee5',
   237: 'SonyLIV',
   350: 'Apple TV+',
@@ -37,6 +45,7 @@ const SUPPORTED_PROVIDERS = {
 const PROVIDER_ID_MAP = {
   'Netflix': 8,
   'Prime Video': 119,
+  'JioHotstar': 122,
   'Hotstar': 122,
   'Jio Cinema': 220,
   'Zee5': 232,
@@ -81,8 +90,9 @@ async function rateLimitedFetch(url) {
 
     try {
       const headers = {};
-      if (TMDB_BEARER_TOKEN && !PLACEHOLDER_TMDB_VALUES.has(TMDB_BEARER_TOKEN)) {
-        headers.Authorization = `Bearer ${TMDB_BEARER_TOKEN}`;
+      const bearer = getTmdbBearerToken();
+      if (bearer && !PLACEHOLDER_TMDB_VALUES.has(bearer)) {
+        headers.Authorization = `Bearer ${bearer}`;
       }
 
       const response = await fetch(url, { signal: controller.signal, headers });
@@ -115,11 +125,13 @@ async function rateLimitedFetch(url) {
  */
 function buildUrl(endpoint, params = {}) {
   const url = new URL(`${TMDB_BASE}${endpoint}`);
+  const key = getTmdbKey();
+  const bearer = getTmdbBearerToken();
 
-  if (TMDB_BEARER_TOKEN && !PLACEHOLDER_TMDB_VALUES.has(TMDB_BEARER_TOKEN)) {
+  if (bearer && !PLACEHOLDER_TMDB_VALUES.has(bearer)) {
     // bearer token auth is handled in fetch headers
-  } else if (TMDB_KEY && !PLACEHOLDER_TMDB_VALUES.has(TMDB_KEY)) {
-    url.searchParams.set('api_key', TMDB_KEY);
+  } else if (key && !PLACEHOLDER_TMDB_VALUES.has(key)) {
+    url.searchParams.set('api_key', key);
   }
 
   Object.entries(params).forEach(([key, value]) => {
@@ -172,14 +184,30 @@ export async function getMovieProviders(tmdbId) {
   const inProviders = data.results?.IN;
   if (!inProviders) return [];
 
-  const flatrate = inProviders.flatrate || [];
-  return flatrate
-    .filter(p => SUPPORTED_PROVIDERS[p.provider_id])
-    .map(p => ({
-      id: p.provider_id,
-      name: SUPPORTED_PROVIDERS[p.provider_id],
-      logo: `https://image.tmdb.org/t/p/w92${p.logo_path}`
-    }));
+  const allProviders = [
+    ...(inProviders.flatrate || []),
+    ...(inProviders.free || []),
+    ...(inProviders.ads || []),
+    ...(inProviders.rent || []),
+    ...(inProviders.buy || [])
+  ];
+
+  const seen = new Set();
+  const results = [];
+
+  for (const p of allProviders) {
+    const name = SUPPORTED_PROVIDERS[p.provider_id];
+    if (name && !seen.has(name)) {
+      seen.add(name);
+      results.push({
+        id: p.provider_id,
+        name: name,
+        logo: `https://image.tmdb.org/t/p/w92${p.logo_path}`
+      });
+    }
+  }
+
+  return results;
 }
 
 /**
@@ -191,14 +219,30 @@ export async function getTVProviders(tmdbId) {
   const inProviders = data.results?.IN;
   if (!inProviders) return [];
 
-  const flatrate = inProviders.flatrate || [];
-  return flatrate
-    .filter(p => SUPPORTED_PROVIDERS[p.provider_id])
-    .map(p => ({
-      id: p.provider_id,
-      name: SUPPORTED_PROVIDERS[p.provider_id],
-      logo: `https://image.tmdb.org/t/p/w92${p.logo_path}`
-    }));
+  const allProviders = [
+    ...(inProviders.flatrate || []),
+    ...(inProviders.free || []),
+    ...(inProviders.ads || []),
+    ...(inProviders.rent || []),
+    ...(inProviders.buy || [])
+  ];
+
+  const seen = new Set();
+  const results = [];
+
+  for (const p of allProviders) {
+    const name = SUPPORTED_PROVIDERS[p.provider_id];
+    if (name && !seen.has(name)) {
+      seen.add(name);
+      results.push({
+        id: p.provider_id,
+        name: name,
+        logo: `https://image.tmdb.org/t/p/w92${p.logo_path}`
+      });
+    }
+  }
+
+  return results;
 }
 
 /**

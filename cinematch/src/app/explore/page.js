@@ -194,14 +194,17 @@ export default function ExplorePage() {
             {/* Actions */}
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button className="btn btn-primary btn-lg" onClick={() => {
-                if (movie.platforms?.[0]) {
-                  const urls = {
-                    'Netflix': 'https://www.netflix.com',
-                    'Prime Video': 'https://www.primevideo.com',
-                    'Hotstar': 'https://www.hotstar.com',
-                  };
-                  window.open(urls[movie.platforms[0].name] || '#', '_blank');
-                }
+                const platformName = movie.platforms?.[0]?.name || 'JioHotstar';
+                const urls = {
+                  'Netflix': 'https://www.netflix.com',
+                  'Prime Video': 'https://www.primevideo.com',
+                  'JioHotstar': 'https://www.jiohotstar.com',
+                  'Hotstar': 'https://www.jiohotstar.com',
+                  'Jio Cinema': 'https://www.jiohotstar.com',
+                  'Zee5': 'https://www.zee5.com',
+                  'SonyLIV': 'https://www.sonyliv.com'
+                };
+                window.open(urls[platformName] || 'https://www.jiohotstar.com', '_blank');
               }}>
                 🎬 I&apos;m Going to Watch This
               </button>
@@ -211,16 +214,17 @@ export default function ExplorePage() {
             </div>
 
             {/* Available on */}
-            {movie.platforms && movie.platforms.length > 0 && (
-              <div style={{ marginTop: 24 }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8 }}>Available on</p>
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-                  {movie.platforms.map((p, i) => (
-                    <span key={i} className="badge">{p.name}</span>
-                  ))}
-                </div>
+            <div style={{ marginTop: 24 }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8 }}>Available on</p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                {((movie.platforms && movie.platforms.length > 0)
+                  ? movie.platforms
+                  : [{ name: 'JioHotstar' }]
+                ).map((p, i) => (
+                  <span key={i} className="badge">{p.name}</span>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>

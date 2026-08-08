@@ -34,12 +34,11 @@ CREATE TABLE ott_platforms (
     tmdb_provider_id INTEGER NOT NULL UNIQUE
 );
 
--- Pre-seed 8 OTT platforms (TMDB provider IDs for India region)
+-- Pre-seed OTT platforms (TMDB provider IDs for India region)
 INSERT INTO ott_platforms (name, logo_url, deep_link_scheme, web_base_url, tmdb_provider_id) VALUES
     ('Netflix',        '/platforms/netflix.svg',        'netflix://',        'https://www.netflix.com',         8),
     ('Prime Video',    '/platforms/prime-video.svg',     'primevideo://',     'https://www.primevideo.com',      119),
-    ('Hotstar',        '/platforms/hotstar.svg',         'hotstar://',        'https://www.hotstar.com',         122),
-    ('Jio Cinema',     '/platforms/jio-cinema.svg',      'jiocinemahd://',    'https://www.jiocinema.com',       220),
+    ('JioHotstar',     '/platforms/jiohotstar.svg',      'hotstar://',        'https://www.jiohotstar.com',      122),
     ('Zee5',           '/platforms/zee5.svg',            'zee5://',           'https://www.zee5.com',            232),
     ('SonyLIV',        '/platforms/sonyliv.svg',         'sonyliv://',        'https://www.sonyliv.com',         237),
     ('Apple TV+',      '/platforms/apple-tv.svg',        'appletv://',        'https://tv.apple.com',            350),

@@ -3,8 +3,8 @@ import { AuthProvider } from '@/lib/AuthContext';
 
 export const metadata = {
   title: 'CineMatch — Personalized Movie & Series Recommendations',
-  description: 'Discover movies and series tailored to your taste across all your streaming platforms. Get AI-powered recommendations from Netflix, Prime Video, Hotstar, and more — all in one place.',
-  keywords: 'movie recommendations, OTT platforms, Netflix, Prime Video, Hotstar, personalized streaming, movie discovery',
+  description: 'Discover movies and series tailored to your taste across all your streaming platforms. Get AI-powered recommendations from Netflix, Prime Video, JioHotstar, and more — all in one place.',
+  keywords: 'movie recommendations, OTT platforms, Netflix, Prime Video, JioHotstar, personalized streaming, movie discovery',
   openGraph: {
     title: 'CineMatch — Your Personal Movie Guide',
     description: 'One app, all your streaming platforms. AI-powered recommendations that learn your taste.',

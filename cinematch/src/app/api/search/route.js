@@ -49,12 +49,11 @@ export async function GET(request) {
         // Try TMDB search first when configured
         const raw = await searchMulti(query, 1);
 
-        for (let i = 0; i < Math.min(raw.length, 20); i++) {
-          const item = raw[i];
-          const isMovie = item.media_type === 'movie';
-
-          let providers = [];
-          if (i < 6) {
+        const itemsToProcess = raw.slice(0, 20);
+        results = await Promise.all(
+          itemsToProcess.map(async (item) => {
+            const isMovie = item.media_type === 'movie';
+            let providers = [];
             try {
               providers = isMovie
                 ? await getMovieProviders(item.id)
@@ -62,24 +61,24 @@ export async function GET(request) {
             } catch {
               providers = [];
             }
-          }
 
-          results.push({
-            id: item.id,
-            tmdb_id: item.id,
-            title: item.title || item.name,
-            overview: item.overview,
-            poster_url: item.poster_path,
-            backdrop_url: item.backdrop_path,
-            imdb_rating: Math.round((item.vote_average || 0) * 10) / 10,
-            content_type: isMovie ? 'movie' : 'series',
-            release_date: item.release_date || item.first_air_date,
-            genres: (item.genre_ids || []).map(gid => GENRE_MAP[gid] || 'other').filter(g => g !== 'other'),
-            platforms: providers,
-            director: null,
-            cast_members: []
-          });
-        }
+            return {
+              id: item.id,
+              tmdb_id: item.id,
+              title: item.title || item.name,
+              overview: item.overview,
+              poster_url: item.poster_path,
+              backdrop_url: item.backdrop_path,
+              imdb_rating: Math.round((item.vote_average || 0) * 10) / 10,
+              content_type: isMovie ? 'movie' : 'series',
+              release_date: item.release_date || item.first_air_date,
+              genres: (item.genre_ids || []).map(gid => GENRE_MAP[gid] || 'other').filter(g => g !== 'other'),
+              platforms: providers,
+              director: null,
+              cast_members: []
+            };
+          })
+        );
       } catch (err) {
         console.warn('TMDB search failed, using fallback:', err.message);
         const q = query.toLowerCase();

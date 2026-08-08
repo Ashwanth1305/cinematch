@@ -9,6 +9,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import bcryptjs from 'bcryptjs';
 import { getMovieDetails, getMovieProviders, hasValidTmdbConfig } from '@/lib/tmdb';
+import { query as pgQuery } from './postgres';
 
 const DATA_DIR = path.join(process.cwd(), '.data');
 
@@ -32,18 +33,26 @@ function saveData(filename, data) {
   fs.renameSync(tempPath, filePath);
 }
 
+// PostgreSQL live write helper
+async function syncToPostgres(sql, params) {
+  try {
+    await pgQuery(sql, params);
+  } catch (err) {
+    console.warn('[PostgreSQL Sync Warning]:', err.message);
+  }
+}
+
 // ==========================================
 // OTT Platforms (static seed data)
 // ==========================================
 const OTT_PLATFORMS = [
-  { id: 1, name: 'Netflix',        logo_url: '/platforms/netflix.png',      deep_link_scheme: 'netflix://',       web_base_url: 'https://www.netflix.com',        tmdb_provider_id: 8   },
-  { id: 2, name: 'Prime Video',    logo_url: '/platforms/prime-video.png',  deep_link_scheme: 'primevideo://',    web_base_url: 'https://www.primevideo.com',     tmdb_provider_id: 119 },
-  { id: 3, name: 'Hotstar',        logo_url: '/platforms/hotstar.png',      deep_link_scheme: 'hotstar://',       web_base_url: 'https://www.hotstar.com',        tmdb_provider_id: 122 },
-  { id: 4, name: 'Jio Cinema',     logo_url: '/platforms/jio-cinema.png',   deep_link_scheme: 'jiocinemahd://',   web_base_url: 'https://www.jiocinema.com',      tmdb_provider_id: 220 },
-  { id: 5, name: 'Zee5',           logo_url: '/platforms/zee5.png',         deep_link_scheme: 'zee5://',          web_base_url: 'https://www.zee5.com',           tmdb_provider_id: 232 },
-  { id: 6, name: 'SonyLIV',        logo_url: '/platforms/sonyliv.png',      deep_link_scheme: 'sonyliv://',       web_base_url: 'https://www.sonyliv.com',        tmdb_provider_id: 237 },
-  { id: 7, name: 'Apple TV+',      logo_url: '/platforms/apple-tv.png',     deep_link_scheme: 'appletv://',       web_base_url: 'https://tv.apple.com',           tmdb_provider_id: 350 },
-  { id: 8, name: 'Lionsgate Play', logo_url: '/platforms/lionsgate.png',    deep_link_scheme: 'lionsgateplay://', web_base_url: 'https://www.lionsgateplay.com',  tmdb_provider_id: 561 }
+  { id: 1, name: 'Netflix',        logo_url: '/platforms/netflix.png',      deep_link_scheme: 'netflix://',       web_base_url: 'https://www.netflix.com',        tmdb_provider_id: 8,   tmdb_provider_ids: [8] },
+  { id: 2, name: 'Prime Video',    logo_url: '/platforms/prime-video.png',  deep_link_scheme: 'primevideo://',    web_base_url: 'https://www.primevideo.com',     tmdb_provider_id: 119, tmdb_provider_ids: [119] },
+  { id: 3, name: 'JioHotstar',     logo_url: '/platforms/jiohotstar.png',   deep_link_scheme: 'hotstar://',       web_base_url: 'https://www.jiohotstar.com',     tmdb_provider_id: 122, tmdb_provider_ids: [122, 220] },
+  { id: 5, name: 'Zee5',           logo_url: '/platforms/zee5.png',         deep_link_scheme: 'zee5://',          web_base_url: 'https://www.zee5.com',           tmdb_provider_id: 232, tmdb_provider_ids: [232] },
+  { id: 6, name: 'SonyLIV',        logo_url: '/platforms/sonyliv.png',      deep_link_scheme: 'sonyliv://',       web_base_url: 'https://www.sonyliv.com',        tmdb_provider_id: 237, tmdb_provider_ids: [237] },
+  { id: 7, name: 'Apple TV+',      logo_url: '/platforms/apple-tv.png',     deep_link_scheme: 'appletv://',       web_base_url: 'https://tv.apple.com',           tmdb_provider_id: 350, tmdb_provider_ids: [350] },
+  { id: 8, name: 'Lionsgate Play', logo_url: '/platforms/lionsgate.png',    deep_link_scheme: 'lionsgateplay://', web_base_url: 'https://www.lionsgateplay.com',  tmdb_provider_id: 561, tmdb_provider_ids: [561] }
 ];
 
 // Genres (static seed data)
@@ -127,6 +136,14 @@ export function createUser({ email, password, name, authProvider = 'email' }) {
   };
   users.push(user);
   saveData('users.json', users);
+
+  // Sync to PostgreSQL in real time
+  syncToPostgres(`
+    INSERT INTO users (id, email, password_hash, feedback_count, created_at)
+    VALUES ($1, $2, $3, $4, $5)
+    ON CONFLICT (id) DO NOTHING;
+  `, [user.id, user.email, user.password_hash, 0, user.created_at]);
+
   return user;
 }
 
@@ -182,9 +199,9 @@ export function setUserSubscriptions(userId, platformIds) {
 
 export function getUserProviderIds(userId) {
   const subs = userOttSubscriptions.filter(s => s.user_id === userId);
-  return subs.map(s => {
+  return subs.flatMap(s => {
     const platform = OTT_PLATFORMS.find(p => p.id === s.ott_platform_id);
-    return platform?.tmdb_provider_id;
+    return platform?.tmdb_provider_ids || (platform?.tmdb_provider_id ? [platform.tmdb_provider_id] : []);
   }).filter(Boolean);
 }
 
@@ -765,12 +782,29 @@ export function submitFeedback(userId, movieId, { watched, rating, likedAspects 
   userFeedback.push(entry);
   saveData('user_feedback.json', userFeedback);
 
-  // Increment feedback count
+  // Increment feedback count in memory
   const userIdx = users.findIndex(u => u.id === userId);
   if (userIdx !== -1) {
     users[userIdx].feedback_count = (users[userIdx].feedback_count || 0) + 1;
     saveData('users.json', users);
   }
+
+  // Sync to PostgreSQL in real time
+  syncToPostgres(`
+    INSERT INTO user_feedback (id, user_id, movie_id, watched, rating, liked_aspects, created_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    ON CONFLICT (id) DO UPDATE SET
+      watched = EXCLUDED.watched,
+      rating = EXCLUDED.rating,
+      liked_aspects = EXCLUDED.liked_aspects;
+  `, [
+    entry.id, entry.user_id, entry.movie_id, entry.watched ? 1 : 0, entry.rating,
+    JSON.stringify(entry.liked_aspects || []), entry.created_at
+  ]);
+
+  syncToPostgres(`
+    UPDATE users SET feedback_count = COALESCE(feedback_count, 0) + 1 WHERE id = $1;
+  `, [userId]);
 
   // Update watchlist status if watched
   if (watched) {

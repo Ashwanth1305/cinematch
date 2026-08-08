@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/AuthContext';
 import styles from './page.module.css';
 
 const PLATFORMS = [
-  'Netflix', 'Prime Video', 'Hotstar', 'Jio Cinema',
+  'Netflix', 'Prime Video', 'JioHotstar',
   'Zee5', 'SonyLIV', 'Apple TV+', 'Lionsgate Play'
 ];
 
@@ -14,7 +14,7 @@ const FEATURES = [
   {
     icon: '🎯',
     title: 'One Place, All Platforms',
-    description: 'Connect your Netflix, Hotstar, Prime Video, and more. We show you content only from platforms you already pay for — no more switching between apps.'
+    description: 'Connect your Netflix, JioHotstar, Prime Video, and more. We show you content only from platforms you already pay for — no more switching between apps.'
   },
   {
     icon: '🧠',
@@ -36,7 +36,7 @@ const FEATURES = [
 const STEPS = [
   {
     title: 'Sign Up & Select Your Platforms',
-    description: 'Create your account and tell us which OTT platforms you subscribe to. We support Netflix, Prime Video, Hotstar, Jio Cinema, Zee5, SonyLIV, Apple TV+, and Lionsgate Play.'
+    description: 'Create your account and tell us which OTT platforms you subscribe to. We support Netflix, Prime Video, JioHotstar, Zee5, SonyLIV, Apple TV+, and Lionsgate Play.'
   },
   {
     title: 'Pick 5 Movies You Loved',

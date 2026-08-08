@@ -23,8 +23,8 @@ function getRatingClass(rating) {
 }
 
 const PLATFORM_ICONS = {
-  'Netflix': '🟥', 'Prime Video': '🔵', 'Hotstar': '🌟',
-  'Jio Cinema': '🟣', 'Zee5': '🟪', 'SonyLIV': '🔴',
+  'Netflix': '🟥', 'Prime Video': '🔵', 'JioHotstar': '✨',
+  'Hotstar': '✨', 'Jio Cinema': '✨', 'Zee5': '🟪', 'SonyLIV': '🔴',
   'Apple TV+': '🍎', 'Lionsgate Play': '🦁'
 };
 
@@ -226,25 +226,26 @@ export default function SharePage() {
             )}
 
             {/* Platforms */}
-            {movie.platforms && movie.platforms.length > 0 && (
-              <div style={{ marginBottom: 20 }}>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Available on
-                </p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {movie.platforms.map((p, i) => (
-                    <span key={i} style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      padding: '8px 16px', background: 'var(--bg-tertiary)',
-                      border: '1px solid var(--border-color)', borderRadius: 'var(--radius-full)',
-                      fontSize: '0.85rem', fontWeight: 500
-                    }}>
-                      {PLATFORM_ICONS[p.name] || '📺'} {p.name}
-                    </span>
-                  ))}
-                </div>
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Available on
+              </p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {((movie.platforms && movie.platforms.length > 0)
+                  ? movie.platforms
+                  : [{ name: 'JioHotstar' }]
+                ).map((p, i) => (
+                  <span key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '8px 16px', background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)', borderRadius: 'var(--radius-full)',
+                    fontSize: '0.85rem', fontWeight: 500
+                  }}>
+                    {PLATFORM_ICONS[p.name] || '✨'} {p.name}
+                  </span>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
 

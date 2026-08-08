@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database Service
+  postgres:
+    image: postgres:16-alpine
+    container_name: cinematch-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2005
+      POSTGRES_DB: cinematch
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Python ML Recommendation Service
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: cinematch-ml-service
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:2005@postgres:5432/cinematch
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # 3. Next.js Web Frontend Service
+  web:
+    build:
+      context: ./cinematch
+      dockerfile: Dockerfile
+    container_name: cinematch-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:2005@postgres:5432/cinematch
+      - ML_SERVICE_URL=http://ml-service:8000
+      - TMDB_API_KEY=1d128e2d2adb96331a1257bfcb4ab046
+    depends_on:
+      - postgres
+      - ml-service
+
+volumes:
+  postgres_data:

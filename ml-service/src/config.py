@@ -10,11 +10,18 @@ import os
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
+from dotenv import load_dotenv
 
 # ---------------------------------------------------------------------------
-# Directory layout
+# Directory layout & Environment Loading
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+ROOT_ENV_FILE = PROJECT_ROOT.parent / ".env"
+
+if ROOT_ENV_FILE.exists():
+    load_dotenv(ROOT_ENV_FILE)
+else:
+    load_dotenv()
 # Data lives in the sibling dataset directory, NOT inside ml-service/data/
 DATA_DIR = Path(os.getenv(
     "CINEMATCH_DATA_DIR",

@@ -9,8 +9,7 @@ import styles from '../onboarding.module.css';
 const PLATFORMS = [
   { id: 1, name: 'Netflix',        icon: '🟥', tmdb_id: 8   },
   { id: 2, name: 'Prime Video',    icon: '🔵', tmdb_id: 119 },
-  { id: 3, name: 'Hotstar',        icon: '🌟', tmdb_id: 122 },
-  { id: 4, name: 'Jio Cinema',     icon: '🟣', tmdb_id: 220 },
+  { id: 3, name: 'JioHotstar',     icon: '✨', tmdb_id: 122 },
   { id: 5, name: 'Zee5',           icon: '🟪', tmdb_id: 232 },
   { id: 6, name: 'SonyLIV',        icon: '🔴', tmdb_id: 237 },
   { id: 7, name: 'Apple TV+',      icon: '🍎', tmdb_id: 350 },
